@@ -56,6 +56,80 @@ select
     , sysutcdatetime()
 from sys.dm_os_performance_counters
 
+;with cte_interval_1
+as
+(
+    select 
+          a.object_name
+        , a.counter_name
+        , b.counter_name            as 'counter_name_base'
+        , a.instance_name
+        , a.cntr_value              
+        , b.cntr_value              as 'cntr_value_base'
+
+    from tempdb.dbo.perf_counter a
+    join tempdb.dbo.perf_counter b           on a.run_id = b.run_id
+                                            and a.object_name = b.object_name
+                                            and charindex(rtrim(replace(replace(replace(b.counter_name
+                                                                    , ' Base', '')
+                                                                    , ' base', '')
+                                                                    , ' BS', '')), a.counter_name) > 0
+                                            and a.instance_name = b.instance_name
+                                            and a.cntr_type = 1073874176
+                                            and b.cntr_type = 1073939712
+
+    where a.run_id = @prev_run_id
+)
+, cte_interval_2
+as
+(
+    select 
+          a.object_name
+        , a.counter_name
+        , b.counter_name            as 'counter_name_base'
+        , a.instance_name
+        , a.cntr_value              
+        , b.cntr_value              as 'cntr_value_base'
+
+    from tempdb.dbo.perf_counter a
+    join tempdb.dbo.perf_counter b           on a.run_id = b.run_id
+                                            and a.object_name = b.object_name
+                                            and charindex(rtrim(replace(replace(replace(b.counter_name
+                                                                    , ' Base', '')
+                                                                    , ' base', '')
+                                                                    , ' BS', '')), a.counter_name) > 0
+                                            and a.instance_name = b.instance_name
+                                            and a.cntr_type = 1073874176
+                                            and b.cntr_type = 1073939712
+
+    where a.run_id = @run_id
+)
+, cte_per_sec_1
+as
+(   
+    select 
+          object_name
+        , counter_name
+        , instance_name
+        , cntr_value              
+        , ts
+    from tempdb.dbo.perf_counter
+    where cntr_type = 272696576
+    and run_id = @prev_run_id
+)
+, cte_per_sec_2
+as
+(
+    select 
+          object_name
+        , counter_name
+        , instance_name
+        , cntr_value         
+        , ts     
+    from tempdb.dbo.perf_counter
+    where cntr_type = 272696576
+    and run_id = @run_id
+)
 -- Raw 
 select 
 	  a.object_name
@@ -65,6 +139,8 @@ select
 from tempdb.dbo.perf_counter a
 where cntr_type = 65792
 and run_id = @run_id
+
+union all
 
 -- Ratio
 select 
@@ -80,99 +156,29 @@ join tempdb.dbo.perf_counter b		on a.run_id = b.run_id
 									and b.cntr_type = 1073939712
 where a.run_id = @run_id
 
-;with cte_interval_1
-as
-(
-    select 
-          a.object_name
-        , a.counter_name
-        , b.counter_name            as 'counter_name_base'
-        , a.instance_name
-        , a.cntr_value              
-        , b.cntr_value              as 'cntr_value_base'
-    from tempdb.dbo.perf_counter a
-    join tempdb.dbo.perf_counter b           on a.run_id = b.run_id
-                                            and a.object_name = b.object_name
-                                            and charindex(rtrim(replace(replace(replace(b.counter_name
-                                                                    , ' Base', '')
-                                                                    , ' base', '')
-                                                                    , ' BS', '')), a.counter_name) > 0
-                                            and a.instance_name = b.instance_name
-                                            and a.cntr_type = 1073874176
-                                            and b.cntr_type = 1073939712
+union all
 
-    where a.run_id = @prev_run_id
-)
-
-, cte_interval_2
-as
-(
-    select 
-          a.object_name
-        , a.counter_name
-        , b.counter_name            as 'counter_name_base'
-        , a.instance_name
-        , a.cntr_value              
-        , b.cntr_value              as 'cntr_value_base'
-    from tempdb.dbo.perf_counter a
-    join tempdb.dbo.perf_counter b           on a.run_id = b.run_id
-                                            and a.object_name = b.object_name
-                                            and charindex(rtrim(replace(replace(replace(b.counter_name
-                                                                    , ' Base', '')
-                                                                    , ' base', '')
-                                                                    , ' BS', '')), a.counter_name) > 0
-                                            and a.instance_name = b.instance_name
-                                            and a.cntr_type = 1073874176
-                                            and b.cntr_type = 1073939712
-
-    where a.run_id = @run_id
-)
+-- Per Interval
 select
       i1.object_name
     , i1.counter_name
     , i1.instance_name
-    , iif(i2.cntr_value_base - i1.cntr_value_base = 0, null, cast((i2.cntr_value - i1.cntr_value) as decimal(28, 0)) / i2.cntr_value_base - i1.cntr_value_base) 'value'
-
+    , iif(i2.cntr_value_base - i1.cntr_value_base = 0, null, cast((i2.cntr_value - i1.cntr_value) as decimal(28, 0)) / (i2.cntr_value_base - i1.cntr_value_base)) 'value'
 from cte_interval_1 i1
-join cte_interval_1 i2        on i1.object_name      = i2.object_name
+join cte_interval_2 i2        on i1.object_name      = i2.object_name
                             and i1.counter_name      = i2.counter_name
                             and i1.counter_name_base = i2.counter_name_base
                             and i1.instance_name     = i2.instance_name
-                            
--- Per Sec
-;with cte_interval_1
-as
-(   
-    select 
-          object_name
-        , counter_name
-        , instance_name
-        , cntr_value              
-        , ts
-    from tempdb.dbo.perf_counter
-    where cntr_type = 272696576
-    and run_id = @prev_run_id
-)
-, cte_interval_2
-as
-(
-    select 
-          object_name
-        , counter_name
-        , instance_name
-        , cntr_value         
-        , ts     
-    from tempdb.dbo.perf_counter
-    where cntr_type = 272696576
-    and run_id = @prev_run_id
-)
+
+union all                       
+
 select
     i1.object_name
     , i1.counter_name
     , i1.instance_name
-    , iif(datediff(second, i1.ts, i2.ts) = 0, null, cast((i2.cntr_value - i1.cntr_value) as decimal(28, 0)) /  datediff(second, i1.ts, i2.ts)) 'value'
+    , iif(datediff(second, i1.ts, i2.ts) = 0, null, cast((i2.cntr_value - i1.cntr_value) as decimal(28, 0)) / datediff(second, i1.ts, i2.ts)) 'value'
 
-from cte_interval_1 i1
-join cte_interval_1 i2       on i1.object_name = i2.object_name
+from cte_per_sec_1 i1
+join cte_per_sec_2 i2       on i1.object_name = i2.object_name
                             and i1.counter_name = i2.counter_name
                             and i1.instance_name = i2.instance_name
