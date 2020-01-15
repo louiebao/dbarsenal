@@ -195,3 +195,19 @@ foreach ($proc in $procs)
         }
     }
 }
+
+###########################
+# Pass parameters by name #
+###########################
+Write-Host "`r`nParameters should be passed into procs by name:" -ForegroundColor Cyan
+
+$procs = Get-ChildItem "C:\dev\project1\Stored Procedures\*.sql"
+
+foreach ($proc in $procs)
+{
+    $match_info = Select-String -Path $proc.FullName -Pattern "exec[ute]*\s+[dbo.]*p_" -AllMatches
+
+    if (!($match_info.Line | Select-String -Pattern "=" -SimpleMatch -Quiet)) {
+        $proc.BaseName
+    }
+}
