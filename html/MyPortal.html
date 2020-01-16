@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>My Portal</title>
+	<style>
+	.heading {
+		font-weight: bold;
+		color: white;
+		background-color: #2baaed;
+		width: 33%;
+	}
+
+	.main_td {
+		vertical-align: top;
+		padding: 10px;
+	}
+
+	.main_border {
+		border: 1px solid black;
+		border-collapse: collapse;
+	}
+
+	a {
+		display: block;
+	}
+
+	.time {
+		font-family: courier;
+	}
+
+	header {
+		display: flex;
+		flex-direction: row;
+	}
+
+	header .profile-links {
+		display: flex;
+		flex-direction: column;
+	}
+
+	header .time-info {
+		display: flex;
+		margin: 0 0 10px auto;
+	}
+
+	</style>
+</head>
+<body vlink="#2baaed" style="font-family: verdana; font-size: 10pt;">
+	<header>
+		<div class="profile-links">
+			<a href="#" target="_blank" rel="noopener noreferrer">Most Frequently Used Links 1</a>
+			<a href="#" target="_blank" rel="noopener noreferrer">Most Frequently Used Links 2</a>
+		</div>
+		<div class="time-info">
+			<table>
+				<tr><td>San Francisco:</td><td><span class="time" id="America/Los_Angeles"></span></td></tr>
+				<tr><td>Denver:</td><td><span class="time" id="America/Denver"></span></td></tr>
+				<tr><td>New York:</td><td><span class="time" id="America/New_York"></span></td></tr>
+				<tr><td>London:</td><td><span class="time" id="Europe/London"></span></td></tr>
+				<tr><td>Calcutta:</td><td><span class="time" id="Asia/Calcutta"></span></td></tr>
+				<tr><td>Melbourne:</td><td><span class="time" id="Australia/Melbourne"></span></td></tr>
+				<tr><td>Wellington:</td><td><span class="time" id="Pacific/Auckland"></span></td></tr>
+			</table>
+		</div>
+	</header>
+	<table class="main_border">
+		<tr>
+			<th class="heading main_border">Topic 1</th>
+			<th class="heading main_border">Topic 2</th>
+			<th class="heading main_border">Topic 3</th>
+		</tr>
+		<tr>
+			<td class="main_border main_td"></td>
+			<td class="main_border main_td"></td>
+			<td class="main_border main_td"></td>
+		</tr>
+		<tr>
+			<th class="heading main_border">Topic 4</th>
+			<th class="heading main_border">Topic 5</th>
+			<th class="heading main_border">Topic 6</th>
+		</tr>
+		<tr>
+			<td class="main_border main_td"></td>
+			<td class="main_border main_td"></td>
+			<td class="main_border main_td"></td>
+		</tr>
+		<tr>
+			<th class="heading main_border">Topic 7</th>
+			<th class="heading main_border">Topic 8</th>
+			<th class="heading main_border">Topic 9</th>
+		</tr>
+		<tr>
+			<td class="main_border main_td"></td>
+			<td class="main_border main_td"></td>
+			<td class="main_border main_td"></td>
+		</tr>
+	</table>
+
+	<script src="moment/moment.js"></script>
+	<script src="moment/moment-timezone-with-data-2010-2020.js"></script>
+	<script>
+
+	function showTime(id) {
+		document.getElementById(id).innerHTML = moment().tz(id).format("ddd hh:mm a z");
+	}
+
+	showTime("America/Los_Angeles"); // First call
+	showTime("America/Denver");
+	showTime("America/New_York");
+	showTime("Europe/London");
+	showTime("Asia/Calcutta");
+	showTime("Australia/Melbourne");
+	showTime("Pacific/Auckland");
+	</script>
+</body>
+</html>
