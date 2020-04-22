@@ -81,11 +81,13 @@ foreach ($object_path in $object_path_array)
     {
         if ($file.FullName | Select-String -Pattern "\Tables\" -SimpleMatch -Quiet)
         {
-            # cast(     => convert()
-            # between   => >= and <=
-            # in (      => or
-            # -1.9 * 3  => -(1.9 * 3)
-            if (Select-String -Path $file.FullName -Pattern "cast\(", " between ", " in \(", "day\(", "as\s.+-\d" -Quiet)
+            # cast(             => convert()
+            # between           => >= and <=
+            # in (              => or
+            # -1.9 * 3          => -(1.9 * 3)
+            # SYSTEM_USER       => suser_sname()
+            # CURRENT_TIMESTAMP => getdate()
+            if (Select-String -Path $file.FullName -Pattern "cast\(", " between ", " in \(", "day\(", "as\s.+-\d", "system_user|SYSTEM_USER", "current_timestamp|CURRENT_TIMESTAMP" -Quiet)
             {
                 "$($file.Name)"
             }
