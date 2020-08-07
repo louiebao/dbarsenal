@@ -1,0 +1,21 @@
+;with cte
+as
+(
+	select 
+		  pl.query_id
+		, round((0.001 * 0.001 * min(s.avg_duration)) / 60., 2)						as 'min_avg_duration (min)'
+		, round((0.001 * 0.001 * max(s.avg_duration)) / 60., 2)						as 'max_avg_duration (min)'
+	from sys.query_store_plan pl  
+	join sys.query_store_runtime_stats s	on pl.plan_id = s.plan_id
+	where 1=1
+	--and pl.query_id = 
+	and s.last_execution_time >= dateadd(day, -10, getdate())
+	group by pl.query_id
+	having round((0.001 * 0.001 * min(s.avg_duration)) / 60., 2) < 1 -- Less than 1 minute
+	and round((0.001 * 0.001 * max(s.avg_duration)) / 60., 2) > 20 -- More than 20 minutes
+)
+select cte.*, txt.query_sql_text
+from cte
+join sys.query_store_query qry			on qry.query_id = cte.query_id
+join sys.query_store_query_text txt     on qry.query_text_id = txt.query_text_id  
+order by [max_avg_duration (min)] desc
