@@ -1,3 +1,17 @@
+/* Identify queries that have degraded performance due to suboptimal plans
+
+
+         |                           o (Bad)
+         |
+         |
+Duration |
+         |
+         |
+         |             o (Good)
+         |_____________________________________
+                       Date Time
+*/
+
 ;with cte
 as
 (
