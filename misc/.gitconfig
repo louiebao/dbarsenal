@@ -1,0 +1,44 @@
+[user]
+    name = Louie Bao
+    email = 
+
+[core]
+  autocrlf = false # Check in and check out the files exactly as they are
+	ignorecase = true
+	sshCommand = "ssh -v"
+	
+[merge]
+    tool = bc3.0
+	
+[mergetool "bc3.0"]
+    cmd = \"c:/program files (x86)/Beyond Compare 3/BCompare.exe\" \"$LOCAL\" \"$REMOTE\" \"$BASE\" \"$MERGED\"
+    keepBackup = false
+    trustExitCode = false
+    prompt = false
+    
+[diff]
+	tool = bc3.0
+	
+[difftool "bc3.0"]
+    cmd = \"c:/program files (x86)/Beyond Compare 3/BCompare.exe\" \"$LOCAL\" \"$REMOTE\"
+    prompt = false
+	
+[alias]
+    l = log \"--pretty=format:%C(yellow bold)%h %C(red bold)%ad %C(white bold)%an %C(reset)%s%C(cyan bold)%d\" --all --decorate --date=short
+    la = log --author="louie" \"--pretty=format:%C(yellow bold)%h %C(red bold)%ad %C(white bold)%an %C(reset)%s%C(cyan bold)%d\" --all --decorate --date=short
+    h = log --follow \"--pretty=format:%C(yellow bold)%h %C(red bold)%ad %C(white bold)%an %C(reset)%s%C(cyan bold)%d\" --all --decorate --date=short
+    f = show --name-status \"--format=%C(yellow bold)%h %C(red bold)%ad %C(white bold)%an %C(reset)%s%C(cyan bold)%d\" --date=short
+    deleted = log --diff-filter=D --summary \"--pretty=format:%C(yellow bold)%h %C(red bold)%ad %C(white bold)%an %C(reset)%s%C(cyan bold)%d\" --date=short
+
+    s = status
+    a = add -A
+    b = branch
+    dif = difftool --cached --dir-diff
+    cm = checkout master
+    cd = checkout develop
+	md = merge develop
+	bdif = difftool --dir-diff
+    sl = shortlog -e -s -n --all --no-merges
+      
+[push]
+    default = simple
