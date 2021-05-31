@@ -1,3 +1,6 @@
+Add-Type -assembly "Microsoft.Office.Interop.Outlook"
+Add-type -assembly "System.Runtime.Interopservices"
+
 $outlook = [Runtime.Interopservices.Marshal]::GetActiveObject('Outlook.Application')
 
 $mapi = $outlook.GetNamespace("MAPI")
@@ -11,6 +14,7 @@ $email          = $outlook.CreateItem(0)
 $email.To       = "louie.bao@email.com"
 $email.Subject  = "Example"
 $email.HtmlBody = $html
+$email.Attachments.Add("$PSScriptRoot\example.csv") | Out-Null
 $email.Send()
 
 <# Use the script below to create a scheduled task.
